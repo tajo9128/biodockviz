@@ -149,7 +149,70 @@ BIODOCKVIZ_CORS_ORIGINS=["http://localhost:3000"]
 - **Streaming Upload** - Support for large files
 - **Background Processing** - Async parsing for large structures
 
-## Status
+## 📚 Documentation
+
+- [Installation Guide](BUILDING.md)
+- [Release Notes](RELEASE_NOTES.md)
+- [GitHub Automation](GITHUB_AUTOMATION.md)
+- [Release Process](RELEASE_PROCESS.md)
+
+---
+
+## 🏗️ Development
+
+### Prerequisites
+- Python 3.11+
+- Node.js 18+
+- Docker Desktop
+
+### Setup
+
+```bash
+git clone https://github.com/tajo9128/biodockviz.git
+cd biodockviz
+pip install -r requirements.txt
+cd frontend && npm install
+```
+
+### Run Development Servers
+
+**Backend:**
+```bash
+cd backend
+uvicorn backend.__init__:app --reload
+```
+
+**Frontend:**
+```bash
+cd frontend
+npm run dev
+```
+
+---
+
+## 📄 License
+
+BioDockViz is licensed under the GNU General Public License v3.0. See [LICENSE](LICENSE) for details.
+
+---
+
+## ✍️ Citation
+
+If you use BioDockViz in your research, please cite:
+
+```bibtex
+@software{biodockviz2024,
+  title = {BioDockViz: Molecular Visualization and Interaction Analysis Platform},
+  author = {BioDockViz Labs},
+  year = {2024},
+  url = {https://github.com/tajo9128/biodockviz},
+  version = {1.0.0}
+}
+```
+
+---
+
+## 🎉 Status
 
 🟢 **Part 1 Complete** - System foundation
 🟢 **Part 2 Complete** - Backend logic & analysis
