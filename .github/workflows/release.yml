@@ -34,6 +34,7 @@ jobs:
         run: |
           choco install nsis -y
           choco install nsis-unicode -y
+          echo "C:\Program Files (x86)\NSIS" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         shell: powershell
       
       - name: Build Frontend
@@ -41,7 +42,7 @@ jobs:
         run: |
           npm ci
           npm run build
-          npm run export
+          npx next export
         shell: powershell
       
       - name: Package Backend
@@ -59,11 +60,15 @@ jobs:
       
       - name: Generate Checksums
         run: |
-          $hash = Get-FileHash -Path "BioDockViz-Setup-1.0.0.exe" -Algorithm SHA256
-          $hash.Hash | Out-File -FilePath "BioDockViz-Setup-1.0.0.exe.sha256" -Encoding ASCII
+          $installer = Get-ChildItem "BioDockViz-Setup-*.exe" | Select-Object -First 1
+          if (-not $installer) { throw "Installer not found" }
+          Write-Host "Found installer: $($installer.Name)"
           
-          $md5hash = Get-FileHash -Path "BioDockViz-Setup-1.0.0.exe" -Algorithm MD5
-          $md5hash.Hash | Out-File -FilePath "BioDockViz-Setup-1.0.0.exe.md5" -Encoding ASCII
+          $hash = Get-FileHash -Path $installer.FullName -Algorithm SHA256
+          $hash.Hash | Out-File -FilePath "$($installer.Name).sha256" -Encoding ASCII
+          
+          $md5hash = Get-FileHash -Path $installer.FullName -Algorithm MD5
+          $md5hash.Hash | Out-File -FilePath "$($installer.Name).md5" -Encoding ASCII
         shell: powershell
       
       - name: Upload Installer
@@ -71,9 +76,9 @@ jobs:
         with:
           name: BioDockViz-Installer
           path: |
-            BioDockViz-Setup-1.0.0.exe
-            BioDockViz-Setup-1.0.0.exe.sha256
-            BioDockViz-Setup-1.0.0.exe.md5
+            BioDockViz-Setup-*.exe
+            BioDockViz-Setup-*.exe.sha256
+            BioDockViz-Setup-*.exe.md5
           retention-days: 90
       
       - name: Create GitHub Release
@@ -81,9 +86,9 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            BioDockViz-Setup-1.0.0.exe
-            BioDockViz-Setup-1.0.0.exe.sha256
-            BioDockViz-Setup-1.0.0.exe.md5
+            BioDockViz-Setup-*.exe
+            BioDockViz-Setup-*.exe.sha256
+            BioDockViz-Setup-*.exe.md5
           body_path: RELEASE_NOTES.md
           draft: false
           prerelease: false
