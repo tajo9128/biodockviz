@@ -1,0 +1,134 @@
+name: Build and Release BioDockViz
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+jobs:
+  build-installer:
+    name: Build Windows Installer
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: Install NSIS
+        run: |
+          choco install nsis -y
+          choco install nsis-unicode -y
+        shell: powershell
+      
+      - name: Build Frontend
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+          npm run export
+        shell: powershell
+      
+      - name: Package Backend
+        working-directory: backend
+        run: |
+          pip install -r requirements.txt
+          python -m pip install pyinstaller
+          pyinstaller --onefile --name BioDockViz __init__.py
+        shell: powershell
+      
+      - name: Build NSIS Installer
+        run: |
+          makensis installer.nsi
+        shell: powershell
+      
+      - name: Generate Checksums
+        run: |
+          $hash = Get-FileHash -Path "BioDockViz-Setup-1.0.0.exe" -Algorithm SHA256
+          $hash.Hash | Out-File -FilePath "BioDockViz-Setup-1.0.0.exe.sha256" -Encoding ASCII
+          
+          $md5hash = Get-FileHash -Path "BioDockViz-Setup-1.0.0.exe" -Algorithm MD5
+          $md5hash.Hash | Out-File -FilePath "BioDockViz-Setup-1.0.0.exe.md5" -Encoding ASCII
+        shell: powershell
+      
+      - name: Upload Installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: BioDockViz-Installer
+          path: |
+            BioDockViz-Setup-1.0.0.exe
+            BioDockViz-Setup-1.0.0.exe.sha256
+            BioDockViz-Setup-1.0.0.exe.md5
+          retention-days: 90
+      
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            BioDockViz-Setup-1.0.0.exe
+            BioDockViz-Setup-1.0.0.exe.sha256
+            BioDockViz-Setup-1.0.0.exe.md5
+          body_path: RELEASE_NOTES.md
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
+  build-docker:
+    name: Build and Push Docker Images
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      
+      - name: Extract version
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+      
+      - name: Build and push backend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: |
+            biodockviz/backend:latest
+            biodockviz/backend:${{ steps.version.outputs.VERSION }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      
+      - name: Build and push frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          tags: |
+            biodockviz/frontend:latest
+            biodockviz/frontend:${{ steps.version.outputs.VERSION }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

@@ -1,0 +1,85 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+    content: [
+        "./src/pages/**/*.{js,ts,jsx,tsx}",
+        "./src/components/**/*.{js,ts,jsx,tsx}",
+        "./src/app/**/*.{js,ts,jsx,tsx}",
+    ],
+    theme: {
+        extend: {
+            colors: {
+                cpk: {
+                    h: "#FFFFFF",
+                    c: "#909090",
+                    n: "#3050F8",
+                    o: "#FF0D0D",
+                    f: "#90E050",
+                    p: "#FF8000",
+                    s: "#FFFF30",
+                    cl: "#1FF01F",
+                    br: "#A62929",
+                    i: "#940094",
+                    fe: "#E06633",
+                    mg: "#8AFF00",
+                    ca: "#3DFF00",
+                    mn: "#9C7AC7",
+                    zn: "#B3B3B3",
+                },
+                ui: {
+                    background: {
+                        primary: "#0F172A",
+                        secondary: "#1E293B",
+                        tertiary: "#334155",
+                        card: "#1E293B",
+                        input: "#0F172A",
+                    },
+                    foreground: {
+                        primary: "#F9FAFB",
+                        secondary: "#E2E8F0",
+                        tertiary: "#94A3B8",
+                        muted: "#64748B",
+                    },
+                    border: {
+                        light: "#374151",
+                        default: "#4B5563",
+                        focus: "#3B82F6",
+                    },
+                    status: {
+                        success: "#10B981",
+                        warning: "#F59E0B",
+                        error: "#EF4444",
+                        info: "#3B82F6",
+                    },
+                },
+            },
+            fontSize: {
+                xs: "0.75rem",
+                sm: "0.875rem",
+                base: "1rem",
+                lg: "1.125rem",
+                xl: "1.25rem",
+                "2xl": "1.5rem",
+                "3xl": "2rem",
+            },
+            spacing: {
+                "1": "0.25rem",
+                "2": "0.5rem",
+                "3": "0.75rem",
+                "4": "1rem",
+                "5": "1.25rem",
+                "6": "1.5rem",
+                "8": "2rem",
+                "10": "2.5rem",
+                "12": "3rem",
+            },
+            borderRadius: {
+                sm: "0.25rem",
+                DEFAULT: "0.375rem",
+                md: "0.5rem",
+                lg: "0.75rem",
+                xl: "1rem",
+            },
+        },
+    },
+    plugins: [],
+}

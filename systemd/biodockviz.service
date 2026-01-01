@@ -1,0 +1,24 @@
+[Unit]
+Description=BioDockViz Backend API
+After=network.target postgresql.service
+
+[Service]
+Type=notify
+User=biodock
+Group=biodock
+WorkingDirectory=/opt/biodockviz/backend
+Environment="PATH=/opt/biodockviz/venv/bin"
+ExecStart=/opt/biodockviz/venv/bin/uvicorn backend.__init__:app --host 0.0.0.0 --port 8000 --workers 4
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=always
+RestartSec=10
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/log/biodockviz /var/lib/biodockviz
+
+[Install]
+WantedBy=multi-user.target
