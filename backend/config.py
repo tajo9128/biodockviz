@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     
     # Application
     APP_NAME: str = "BioDockViz"
-    APP_VERSION: str = "1.0.0"
+    BIO_DOCK_VERSION: str = "1.0.1"
     START_TIME: datetime = Field(default_factory=datetime.now)
     
     # Server

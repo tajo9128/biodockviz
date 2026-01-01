@@ -33,10 +33,11 @@ from .validators import FileValidator, ContentTypeValidator
 from .utils import calculate_hash, generate_correlation_id
 
 logger = get_logger(__name__)
+
 app = FastAPI(
     title="BioDockViz API",
     description="Molecular visualization and analysis platform",
-    version="1.0.0",
+    version=settings.BIO_DOCK_VERSION,
     docs_url="/docs",
     redoc_url="/redoc",
 )
@@ -51,8 +52,12 @@ app.add_middleware(
 
 static_files_path = BASE_DIR / "static"
 if static_files_path.exists():
-    static_files = StaticFiles(directory=str(static_files_path), html=False)
-    app.mount("/static", static_files, name="static")
+    app.mount("/static", StaticFiles(directory=str(static_files_path), html=False), name="static")
+
+# Mount frontend build if available (for desktop app)
+frontend_dist = Path("frontend_dist")
+if frontend_dist.exists():
+    app.mount("/", StaticFiles(directory=str(frontend_dist), html=True), name="frontend")
 
 @app.on_event("startup")
 async def startup_event():
@@ -137,7 +142,7 @@ async def health_check():
             "uptime_seconds": int((datetime.now() - settings.START_TIME).total_seconds()),
             "timestamp": datetime.now().isoformat(),
             "environment": settings.ENVIRONMENT,
-            "version": "1.0.0",
+            "version": settings.BIO_DOCK_VERSION,
         }
     except Exception as e:
         logger.error(f"Health check failed: {e}", exc_info=True)
@@ -149,7 +154,7 @@ async def health_check():
             },
             "timestamp": datetime.now().isoformat(),
             "environment": settings.ENVIRONMENT,
-            "version": "1.0.0",
+            "version": settings.BIO_DOCK_VERSION,
         }
 
 @app.get("/")
@@ -157,7 +162,7 @@ async def root():
     """Root endpoint"""
     return {
         "name": "BioDockViz API",
-        "version": "1.0.0",
+        "version": settings.BIO_DOCK_VERSION,
         "status": "running",
         "docs": "/docs",
         "health": "/health",

@@ -25,9 +25,9 @@ if ([string]::IsNullOrEmpty($gitUser) -or [string]::IsNullOrEmpty($gitEmail)) {
     Write-Host "Configuring git..." -ForegroundColor Yellow
     git config user.name "tajo9128"
     git config user.email "tajo9128@gmail.com"
-    Write-Host "✓ Git configured: tajo9128 <tajo9128@gmail.com>" -ForegroundColor Green
+    Write-Host "✓ Git configured: tajo9128 (tajo9128@gmail.com)" -ForegroundColor Green
 } else {
-    Write-Host "✓ Git already configured: $gitUser <$gitEmail>" -ForegroundColor Green
+    Write-Host "✓ Git already configured: $gitUser ($gitEmail)" -ForegroundColor Green
 }
 
 # Check remote

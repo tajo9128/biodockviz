@@ -95,6 +95,7 @@ export interface VisualizationState {
     visibleAtoms: number[];
     hiddenAtoms: number[];
     interactionTypes: ("hydrogen_bond" | "vdw_contact" | "salt_bridge")[];
+    camera?: CameraSettings;
 }
 
 export interface ErrorResponse {
@@ -114,4 +115,30 @@ export interface UploadResponse {
     contentType: string;
     stage: "upload" | "parsing" | "analyzed";
     timestamp: string;
+}
+
+export interface SnapshotMetadata {
+    timestamp: string;
+    structure: {
+        name: string;
+        atomCount: number;
+        fileHash: string;
+    };
+    visualization: VisualizationState;
+    camera?: CameraSettings;
+    interactions: {
+        hydrogenBonds: number;
+        vdwContacts: number;
+        saltBridges: number;
+        displayedTypes: string[];
+    };
+    analysis: {
+        thresholds: Record<string, number>;
+    };
+    exportFormat: string;
+    resolution: number;
+    dpi: number;
+    backgroundColor: string;
+    visibleAtoms: number[];
+    hiddenAtoms: number[];
 }

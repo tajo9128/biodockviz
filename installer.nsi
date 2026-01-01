@@ -14,19 +14,19 @@ CRCCheck on
 !include "FileFunc.nsh"
 
 Name "BioDockViz"
-OutFile "BioDockViz-Setup-1.0.0.exe"
+OutFile "BioDockViz-Setup-1.0.1.exe"
 InstallDir "$PROGRAMFILES64\BioDockViz"
 InstallDirRegKey HKLM "Software\BioDockViz" "InstallDir"
 RequestExecutionLevel admin
 ShowInstDetails show
 
-VIProductVersion "1.0.0.0"
+VIProductVersion "1.0.1.0"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "BioDockViz"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "BioDockViz Labs"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "Molecular Visualization Platform"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "© 2024 BioDockViz Labs"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "1.0.0"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "1.0.0"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "1.0.1"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "1.0.1"
 
 Var StartMenuFolder
 
@@ -46,8 +46,19 @@ Section "BioDockViz Core" SEC01
   
   SetOutPath "$INSTDIR"
   
-  File /r "backend\*.*"
+  SetOutPath "$INSTDIR"
+  
+  ; Packaged Backend Executable
+  File "backend\dist\BioDockViz.exe"
+  
+  ; License
+  File "LICENSE"
+  
+  ; Frontend Static Files
+  SetOutPath "$INSTDIR\frontend_dist"
   File /r "frontend\out\*.*"
+  
+  SetOutPath "$INSTDIR"
   
   WriteRegStr HKLM "Software\BioDockViz" "InstallDir" "$INSTDIR"
   WriteRegStr HKLM "Software\BioDockViz" "Version" "1.0.0"
